@@ -287,44 +287,44 @@ Resources:
                   # CustomData: !Sub 'Are you sure you want to deploy all resources in PRD?'
                 # RunOrder: 1
               # - !Ref AWS::NoValue
-    # # Pipeline - Infra
-            # - !If
-              # - CreateTstResources
-              # - Name: CreateInfraChangeSet
-                # ActionTypeId:
-                  # Category: Deploy
-                  # Owner: AWS
-                  # Provider: CloudFormation
-                  # Version: 1
-                # InputArtifacts:
-                  # - Name: Source
-                  # - Name: Build
-                # OutputArtifacts:
-                  # - Name: CreateInfraChangeSet
-                # Configuration:
-                  # ActionMode: CHANGE_SET_REPLACE
-                  # Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
-                  # RoleArn: !GetAtt [CodePipelineCloudFormationRole, Arn]
-                  # ChangeSetName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "Infra"] ]
-                  # StackName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "infra"] ]
-                  # TemplatePath: !Sub "Build::infra.yaml"
-                # RunOrder: 10
-              # - !Ref AWS::NoValue
-            # - !If
-              # - CreateTstResources
-              # - Name: ExecuteInfraChangeSet
-                # ActionTypeId:
-                  # Category: Deploy
-                  # Owner: AWS
-                  # Provider: CloudFormation
-                  # Version: 1
-                # Configuration:
-                  # ActionMode: CHANGE_SET_EXECUTE
-                  # ChangeSetName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "Infra"] ]
-                  # RoleArn: !GetAtt [CodePipelineCloudFormationRole, Arn]
-                  # StackName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "infra"] ]
-                # RunOrder: 11
-              # - !Ref AWS::NoValue
+    # Pipeline - Infra
+            - !If
+              - CreateDevResources
+              - Name: CreateS3StaticHostingChangeSet
+                ActionTypeId:
+                  Category: Deploy
+                  Owner: AWS
+                  Provider: CloudFormation
+                  Version: 1
+                InputArtifacts:
+                  - Name: Source
+                  - Name: Build
+                OutputArtifacts:
+                  - Name: CreateS3StaticHostingChangeSet
+                Configuration:
+                  ActionMode: CHANGE_SET_REPLACE
+                  Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                  RoleArn: !GetAtt [CodePipelineCloudFormationRole, Arn]
+                  ChangeSetName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "S3StaticHosting"] ]
+                  StackName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "S3StaticHosting"] ]
+                  TemplatePath: !Sub "Build::s3-static-hosting.yaml"
+                RunOrder: 10
+              - !Ref AWS::NoValue
+            - !If
+              - CreateDevResources
+              - Name: ExecuteS3StaticHostingChangeSet
+                ActionTypeId:
+                  Category: Deploy
+                  Owner: AWS
+                  Provider: CloudFormation
+                  Version: 1
+                Configuration:
+                  ActionMode: CHANGE_SET_EXECUTE
+                  ChangeSetName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "S3StaticHosting"] ]
+                  RoleArn: !GetAtt [CodePipelineCloudFormationRole, Arn]
+                  StackName: !Join [ "-", [ !Ref ProjectID, !Ref EnvironmentType, "S3StaticHosting"] ]
+                RunOrder: 11
+              - !Ref AWS::NoValue
             # - !If
               # - CreatePrdResources
               # - Name: CreateInfraChangeSet
