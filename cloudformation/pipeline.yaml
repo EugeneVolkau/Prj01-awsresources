@@ -41,7 +41,7 @@ Parameters:
   GitHubRepository:
     Description: Enter the repository name that should be monitored for changes
     Type: String
-    Default: proj-name-name
+    Default: ServerlessApp
 
   GitHubBranch:
     Description: Enter the GitHub branch to monitored
