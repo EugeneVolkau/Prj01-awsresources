@@ -521,10 +521,6 @@ Outputs:
     Value: !Ref ArtifactBucket
     Export:
       Name: !Sub ArtifactBucket
-  CertExportBucket:
-    Value: !Ref CertExportBucket
-    Export:
-      Name: CertExportBucket
   ProjectID:
     Value: !Ref ProjectID
     Export:
