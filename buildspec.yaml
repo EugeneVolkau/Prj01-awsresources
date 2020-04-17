@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+    finally:
+      - echo This always runs even if the update or install command fails
+  build:
+    commands:
+      - echo Entering the build phase...
+      # - echo $(pwd)
+      # - ls $(pwd)
+      - echo Building started on `date`
+      # - aws cloudformation package --template-file cfn/iot.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file iot.yaml
+      # - aws cloudformation package --template-file cfn/infra.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file infra.yaml
+    finally:
+      - echo This always runs even if the install command fails
+artifacts:
+  type: zip
+  files:
+    # - 'iot.yaml'
+    # - 'infra.yaml'    
+  discard-paths: yes
