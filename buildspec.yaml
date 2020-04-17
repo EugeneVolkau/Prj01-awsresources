@@ -12,13 +12,13 @@ phases:
       # - echo $(pwd)
       # - ls $(pwd)
       - echo Building started on `date`
-      # - aws cloudformation package --template-file cfn/iot.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file iot.yaml
+      - aws cloudformation package --template-file cloudformation/s3-static-hosting.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file s3-static-hosting.yaml
       # - aws cloudformation package --template-file cfn/infra.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file infra.yaml
     finally:
       - echo This always runs even if the install command fails
 artifacts:
   type: zip
   files:
-    # - 'iot.yaml'
+    - 's3-static-hosting.yaml'
     # - 'infra.yaml'    
   discard-paths: yes
