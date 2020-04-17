@@ -7,7 +7,7 @@ Description:
 Parameters:
   BucketName:
     Type: String
-    Default: ServerlessApp
+    Default: sapp
     Description: The name for the bucket hosting your website.
 
 Metadata:
