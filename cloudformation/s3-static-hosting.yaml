@@ -41,7 +41,13 @@ Resources:
             Principal: "*"
             Action: s3:GetObject
             Resource: !Sub "arn:aws:s3:::${WebsiteBucket}/*"
-
+               
+  CleanupArtifactBucketOnDelete:
+    Type: Custom::cleanupbucket
+    Properties:
+      ServiceToken: !ImportValue EmptyS3OnDeleteLambdaARN
+      BucketName: !Ref WebsiteBucket       
+          
 Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
