@@ -45,3 +45,11 @@ Resources:
 Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
+    
+  WebsiteBucketARN:
+    Value:
+       Fn::GetAtt: 
+          - "WebsiteBucket"
+          - "Arn"    
+    Export:
+      Name: WebsiteBucketARN       
