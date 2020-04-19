@@ -13,12 +13,12 @@ phases:
       # - ls $(pwd)
       - echo Building started on `date`
       - aws cloudformation package --template-file cloudformation/s3-static-hosting.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file s3-static-hosting.yaml
-      # - aws cloudformation package --template-file cfn/infra.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file infra.yaml
+      - aws cloudformation package --template-file cloudformation/cognito.yaml --s3-bucket $ARTIFACT_S3_BUCKET --output-template-file cognito.yaml
     finally:
       - echo This always runs even if the install command fails
 artifacts:
   type: zip
   files:
     - 's3-static-hosting.yaml'
-    # - 'infra.yaml'    
+    - 'cognito.yaml'       
   discard-paths: yes
