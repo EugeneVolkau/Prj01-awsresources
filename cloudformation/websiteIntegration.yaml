@@ -1,0 +1,15 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description:
+  Triggers UpdateWebConfigLambda to update website config in WebsiteBucket and integrate it with AWS Cognito and Amazon API.
+
+Resources:
+  UpdateConfig:
+    Properties:
+      ServiceToken: !ImportValue UpdateWebConfigLambdaARN
+      UserPool: !ImportValue UserPoolId
+      Client: !ImportValue UserPoolClientId
+      Region: !Ref "AWS::Region"
+      Bucket: !ImportValue WebsiteBucketName
+    Type: "Custom::ConfigFile"
