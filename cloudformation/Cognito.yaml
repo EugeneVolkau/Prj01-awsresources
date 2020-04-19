@@ -1,0 +1,34 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description:
+  A Simple Cognito User Pool.
+
+Resources:
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, !ImportValue WebsiteBucketName, 'UserPool'] ]
+      AliasAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName:  !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, !ImportValue WebsiteBucketName, 'Client'] ]
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+    
+Outputs:     
+  UserPoolId:
+    Value: !Ref UserPool
+    Export:
+      Name: UserPoolId
+
+  UserPoolClientId:
+    Value: !Ref UserPoolClient
+    Export:
+      Name: UserPoolClientId      
