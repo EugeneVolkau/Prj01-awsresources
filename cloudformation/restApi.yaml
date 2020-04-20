@@ -1,0 +1,43 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  Creates RestApi which will be used by resources defined in other stacks.
+
+Resources: 
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'RestApi'] ]
+      Description: RestApi API Gateway 
+
+  Authorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'Authorizer'] ]
+      RestApiId:
+        Ref: apiGateway
+      Type: COGNITO_USER_POOLS
+      ProviderARNs: 
+        - !ImportValue UserPoolARN      
+      IdentitySource: method.request.header.Authorization
+
+Outputs:
+  apiGatewayId:
+    Value:
+      Ref: apiGateway
+    Export:
+      Name: apiGatewayId
+
+  apiGatewayRootResourceId:
+    Value:
+      Fn::GetAtt:
+        - apiGateway
+        - RootResourceId
+    Export:
+      Name: apiGatewayRootResourceId
+
+  ApiAuthorizer:
+    Value:
+      Ref: Authorizer
+    Export:
+      Name: ApiAuthorizer      
