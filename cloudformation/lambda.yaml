@@ -7,7 +7,6 @@ Globals:
       MemorySize: 128
       Runtime: nodejs10.x
       Timeout: 3
-      Handler: index.handler
 Resources:
 
 # Roles
