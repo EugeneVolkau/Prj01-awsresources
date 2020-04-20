@@ -12,4 +12,5 @@ Resources:
       Client: !ImportValue UserPoolClientId
       Region: !Ref "AWS::Region"
       Bucket: !ImportValue WebsiteBucketName
+      InvokeUrl: !ImportValue APIdeploymentURL
     Type: "Custom::ConfigFile"
