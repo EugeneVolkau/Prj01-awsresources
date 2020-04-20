@@ -46,22 +46,22 @@ Resources:
                   - dynamodb:PutItem
                 Resource: !ImportValue DynamoDBTable0lARN           
                 
-  # UnicornPostLambda:
-    # Type: AWS::Serverless::Function
-    # Properties:
-      # FunctionName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'UnicornPost'] ]
-      # # Environment:
-        # # Variables:
-          # # USER_POOL_ID: !Ref UserPool
-          # # USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          # # REGION: !Sub '${AWS::Region}'
-      # Role: !GetAtt UnicornPostLambdaRole.Arn
-      # CodeUri: ../lambda/api/requestUnicorn
-      # AutoPublishAlias: !ImportValue EnvironmentType
-      # Events:
-        # GetUsers:
-          # Type: Api
-          # Properties:
-            # RestApiId: !ImportValue apiGatewayId
-            # Path: /ride
-            # Method: post
+  UnicornPostLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'UnicornPost'] ]
+      # Environment:
+        # Variables:
+          # USER_POOL_ID: !Ref UserPool
+          # USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          # REGION: !Sub '${AWS::Region}'
+      Role: !GetAtt UnicornPostLambdaRole.Arn
+      CodeUri: ../lambda/api/requestUnicorn
+      AutoPublishAlias: !ImportValue EnvironmentType
+      Events:
+        PostRequest:
+          Type: Api
+          Properties:
+            RestApiId: !ImportValue apiGatewayId
+            Path: /ride
+            Method: post
