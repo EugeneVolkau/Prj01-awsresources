@@ -1,0 +1,31 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  Creates DynamoDB table to store user requests and defines access control using AIM role.
+
+Resources:
+
+# Store
+  DynamoDBTable01:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Rides
+      AttributeDefinitions:
+        - AttributeName: RideId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: RideId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+Outputs:     
+      
+  DynamoDBTable01ARN:
+    Value: !GetAtt [DynamoDBTable01, Arn]
+       # Fn::GetAtt: 
+          # - "DynamoDBTable01"
+          # - "Arn"    
+    Export:
+      Name: DynamoDBTable0lARN   
