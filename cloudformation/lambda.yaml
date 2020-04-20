@@ -57,11 +57,11 @@ Resources:
           # REGION: !Sub '${AWS::Region}'
       Role: !GetAtt UnicornPostLambdaRole.Arn
       CodeUri: ../lambda/api/requestUnicorn
-      AutoPublishAlias: !ImportValue EnvironmentType
-      Events:
-        PostRequest:
-          Type: Api
-          Properties:
-            RestApiId: !ImportValue apiGatewayId
-            Path: /ride
-            Method: post
+      # AutoPublishAlias: !ImportValue EnvironmentType
+      # Events:
+        # PostRequest:
+          # Type: Api
+          # Properties:
+            # RestApiId: !ImportValue apiGatewayId
+            # Path: /ride
+            # Method: post
