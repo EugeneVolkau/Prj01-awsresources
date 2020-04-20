@@ -27,6 +27,14 @@ Outputs:
     Value: !Ref UserPool
     Export:
       Name: UserPoolId
+      
+  UserPoolARN:
+    Value:
+       Fn::GetAtt: 
+          - "UserPool"
+          - "Arn"    
+    Export:
+      Name: UserPoolARN      
 
   UserPoolClientId:
     Value: !Ref UserPoolClient
