@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: ['AWS::Serverless-2016-10-31']
+Description: This stack will create Lambda Functions for the project and thier IAM roles.
+
+Globals:
+  Function:
+      MemorySize: 128
+      Runtime: nodejs10.x
+      Timeout: 3
+      Handler: index.handler
+Resources:
+
+
+# Roles
+  # Grants your Lambda function permission to write logs to Amazon CloudWatch Logs and access to write items to your DynamoDB table.              
+  UnicornPostLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'LambdaDB'] ]
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'DynamoDBWriteAccess'] ]
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - 'Fn::Join':
+                      - ':'
+                      - - 'arn:aws:logs'
+                        - Ref: 'AWS::Region'
+                        - Ref: 'AWS::AccountId'
+                        - 'log-group:/aws/lambda/*:*:*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource: !ImportValue DynamoDBTable0lARN           
+                
+  UnicornPostLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'UnicornPost'] ]
+      # Environment:
+        # Variables:
+          # USER_POOL_ID: !Ref UserPool
+          # USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          # REGION: !Sub '${AWS::Region}'
+      Role: !GetAtt UnicornPostLambdaRole.Arn
+      CodeUri: ../lambda/api/requestUnicorn
+      AutoPublishAlias: !ImportValue EnvironmentType
+      Events:
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !ImportValue apiGatewayId
+            Path: /ride
+            Method: post
