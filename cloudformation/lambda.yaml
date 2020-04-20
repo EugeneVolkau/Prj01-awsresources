@@ -50,6 +50,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'UnicornPost'] ]
+      Description: Posts requests to dynamo DB table.
+      Handler: requestUnicorn.handler    
       # Environment:
         # Variables:
           # USER_POOL_ID: !Ref UserPool
