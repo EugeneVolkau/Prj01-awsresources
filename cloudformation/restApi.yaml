@@ -1,14 +1,17 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description:
-  Creates RestApi which will be used by resources defined in other stacks.
+  Creates Authorizier and RestApi which will be used by resources defined in other stacks.
 
 Resources: 
   apiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: !Join [ '-', [ !ImportValue ProjectID, !ImportValue EnvironmentType, 'RestApi'] ]
-      Description: RestApi API Gateway 
+      Description: RestApi API Gateway
+      EndpointConfiguration:
+        Types:
+          - EDGE      
 
   Authorizer:
     Type: AWS::ApiGateway::Authorizer
