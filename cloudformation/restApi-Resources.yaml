@@ -5,42 +5,79 @@ Description:
 
 Resources:
 
-  # ride
-  Resource01:
+  # # ride
+  # Resource01:
+    # Type: AWS::ApiGateway::Resource
+    # Properties:
+      # ParentId: !ImportValue apiGatewayRootResourceId
+      # PathPart: ride
+      # RestApiId: !ImportValue apiGatewayId
+
+  WildRydeApiGatewayRidesResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !ImportValue apiGatewayRootResourceId
       PathPart: ride
       RestApiId: !ImportValue apiGatewayId
-
+        
   WildRydesRideOptionsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
       RestApiId: !ImportValue apiGatewayId
-      ResourceId: !Ref Resource01
+      ResourceId:
+        Ref: WildRydeApiGatewayRidesResource
       HttpMethod: OPTIONS
       Integration:
         IntegrationResponses:
-          - StatusCode: 200
-            ResponseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-            ResponseTemplates:
-              application/json: ''
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: ''
         PassthroughBehavior: WHEN_NO_MATCH
         RequestTemplates:
           application/json: '{"statusCode": 200}'
         Type: MOCK
       MethodResponses:
-        - StatusCode: 200
-          ResponseModels:
-            application/json: 'Empty'
-          ResponseParameters:
+      - StatusCode: 200
+        ResponseModels:
+          application/json: 'Empty'
+        ResponseParameters:
             method.response.header.Access-Control-Allow-Headers: false
             method.response.header.Access-Control-Allow-Methods: false
             method.response.header.Access-Control-Allow-Origin: false
+                       
+  # RestApiCORSOptionMethod:
+      # Type: "AWS::ApiGateway::Method"
+      # Properties:
+        # ResourceId: !Ref HelloCORSRestApiResource
+        # RestApiId: !Ref HelloCORSRestApi
+        # AuthorizationType: NONE
+        # HttpMethod: OPTIONS
+        # Integration:
+          # Type: MOCK
+          # IntegrationResponses:
+            # - ResponseParameters:
+                # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                # method.response.header.Access-Control-Allow-Origin: "'*'"
+              # ResponseTemplates:
+                # application/json: ''
+              # StatusCode: '200'
+          # PassthroughBehavior: NEVER
+          # RequestTemplates:
+            # application/json: '{"statusCode": 200}'
+        # MethodResponses:
+          # - ResponseModels:
+              # application/json: Empty
+            # ResponseParameters:
+              # method.response.header.Access-Control-Allow-Headers: true
+              # method.response.header.Access-Control-Allow-Methods: true
+              # method.response.header.Access-Control-Allow-Origin: true
+            # StatusCode: '200'            
 
   WildRydesRidePostMethod:
     Type: AWS::ApiGateway::Method
@@ -48,7 +85,8 @@ Resources:
       AuthorizerId: !ImportValue ApiAuthorizer
       AuthorizationType: COGNITO_USER_POOLS
       HttpMethod: POST
-      ResourceId: !Ref Resource01
+      ResourceId:
+        Ref: WildRydeApiGatewayRidesResource
       RestApiId: !ImportValue apiGatewayId
       Integration:
         Type: AWS_PROXY
@@ -65,26 +103,363 @@ Resources:
                     - '2015-03-31'
                     - 'functions'
                     - Fn::ImportValue: UnicornPostLambdaARN
-                    - 'invocations'  
-# API Deployment
+                    - 'invocations'           
+        IntegrationResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: ''
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+      - StatusCode: 200
+        ResponseModels:
+          application/json: 'Empty'
+        ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true             
+          
+        # IntegrationResponses:
+        # - StatusCode: 200
+          # ResponseParameters:
+            # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            # method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+            # method.response.header.Access-Control-Allow-Origin: "'*'"
+          # ResponseTemplates:
+            # application/json: ''
+        # PassthroughBehavior: WHEN_NO_MATCH
+        # RequestTemplates:
+          # application/json: '{"statusCode": 200}'
+      # MethodResponses:
+      # - StatusCode: 200
+        # ResponseModels:
+          # application/json: 'Empty'
+        # ResponseParameters:
+            # method.response.header.Access-Control-Allow-Headers: false
+            # method.response.header.Access-Control-Allow-Methods: false
+            # method.response.header.Access-Control-Allow-Origin: false       
+          
   WildRydesApiGatewayDeployment:
+    DependsOn: WildRydesRidePostMethod  
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Wild Rydes Api
       RestApiId: !ImportValue apiGatewayId
-      StageName: !ImportValue EnvironmentType   
+      StageName: prod
+          
+          
+          
+  # HelloCORSRestApiRequestPOST:
+    # DependsOn: LambdaPermission
+    # Type: 'AWS::ApiGateway::Method'
+    # Properties:
+      # AuthorizationType: NONE
+      # HttpMethod: POST
+      # Integration:
+        # Type: AWS
+        # IntegrationHttpMethod: POST
+        # Uri: !Join 
+          # - ''
+          # - - 'arn:aws:apigateway:'
+            # - !Ref 'AWS::Region'
+            # - ':lambda:path/2015-03-31/functions/'
+            # - !GetAtt 
+              # - HelloLambda
+              # - Arn
+            # - /invocations
+        # IntegrationResponses:
+          # - StatusCode: 200
+            # ResponseTemplates:
+              # application/json: $input.json('$')
+            # ResponseParameters:
+                # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                # method.response.header.Access-Control-Allow-Origin: "'*'"
+        # RequestTemplates:
+          # application/json: $input.json('$')
+      # RequestParameters:
+        # method.request.querystring.name: false
+      # ResourceId: !Ref HelloCORSRestApiResource
+      # RestApiId: !Ref HelloCORSRestApi
+      # MethodResponses:
+        # - ResponseParameters:
+            # method.response.header.Access-Control-Allow-Headers: true
+            # method.response.header.Access-Control-Allow-Methods: true
+            # method.response.header.Access-Control-Allow-Origin: true
+          # StatusCode: '200'
+          
+          
 
-Outputs:
-  APIdeploymentURL:
-    Value: 
-       Fn::Join:
-          - ''
-          - - 'https://'
-            - !ImportValue apiGatewayId
-            - '.execute-api.'
-            - !Ref 'AWS::Region'
-            - '.amazonaws.com'
-            - "/" 
-            - !ImportValue EnvironmentType
-    Export:
-      Name: APIdeploymentURL  
+
+
+
+
+
+      
+      
+  # # HelloCORSRestApiResource:
+    # # Type: 'AWS::ApiGateway::Resource'
+    # # Properties:
+      # # RestApiId: !Ref HelloCORSRestApi
+      # # ParentId: !GetAtt 
+        # # - HelloCORSRestApi
+        # # - RootResourceId
+      # # PathPart: hello      
+      
+      
+  # # ApiStage:
+    # # DependsOn:
+      # # - ApiGatewayAccount
+    # # Type: 'AWS::ApiGateway::Stage'
+    # # Properties:
+      # # DeploymentId: !Ref ApiDeployment
+      # # MethodSettings:
+        # # - DataTraceEnabled: true
+          # # HttpMethod: '*'
+          # # LoggingLevel: INFO
+          # # ResourcePath: /*
+      # # RestApiId: !Ref HelloCORSRestApi
+      # # StageName: Prod
+      # # Variables:
+        # # Tom: Maslen-v4      
+      
+      
+
+  # WildRydesRideOptionsMethod:
+    # Type: AWS::ApiGateway::Method
+    # DependsOn: Resource01        
+    # Properties:
+      # AuthorizationType: NONE
+      # RestApiId: !ImportValue apiGatewayId
+      # ResourceId: !Ref Resource01
+      # HttpMethod: OPTIONS
+      # Integration:
+        # Type: MOCK
+        # IntegrationResponses:
+          # - ResponseParameters:
+              # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              # method.response.header.Access-Control-Allow-Origin: "'*'"
+            # ResponseTemplates:
+              # application/json: ''
+            # StatusCode: '200'
+        # PassthroughBehavior: NEVER
+        # RequestTemplates:
+          # application/json: '{"statusCode": 200}'
+      # MethodResponses:
+        # - ResponseModels:
+            # application/json: Empty
+          # ResponseParameters:
+            # method.response.header.Access-Control-Allow-Headers: true
+            # method.response.header.Access-Control-Allow-Methods: true
+            # method.response.header.Access-Control-Allow-Origin: true
+          # StatusCode: '200' 
+            
+  # # RestApiCORSOptionMethod:
+      # # Type: "AWS::ApiGateway::Method"
+      # # Properties:
+        # # ResourceId: !Ref HelloCORSRestApiResource
+        # # RestApiId: !Ref HelloCORSRestApi
+        # # AuthorizationType: NONE
+        # # HttpMethod: OPTIONS
+        # # Integration:
+          # # Type: MOCK
+          # # IntegrationResponses:
+            # # - ResponseParameters:
+                # # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                # # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                # # method.response.header.Access-Control-Allow-Origin: "'*'"
+              # # ResponseTemplates:
+                # # application/json: ''
+              # # StatusCode: '200'
+          # # PassthroughBehavior: NEVER
+          # # RequestTemplates:
+            # # application/json: '{"statusCode": 200}'
+        # # MethodResponses:
+          # # - ResponseModels:
+              # # application/json: Empty
+            # # ResponseParameters:
+              # # method.response.header.Access-Control-Allow-Headers: true
+              # # method.response.header.Access-Control-Allow-Methods: true
+              # # method.response.header.Access-Control-Allow-Origin: true
+            # # StatusCode: '200'            
+            
+            
+
+  # WildRydesRidePostMethod:
+    # Type: AWS::ApiGateway::Method
+    # DependsOn: Resource01        
+    # Properties:
+      # AuthorizerId: !ImportValue ApiAuthorizer    
+      # AuthorizationType: COGNITO_USER_POOLS
+      # HttpMethod: POST
+      # ResourceId: !Ref Resource01      
+      # RestApiId: !ImportValue apiGatewayId
+      # Integration:
+        # Type: AWS_PROXY
+        # IntegrationHttpMethod: POST
+        # Uri:
+          # Fn::Join:
+            # - ':'
+            # - - 'arn:aws:apigateway'
+              # - Ref: 'AWS::Region'
+              # - 'lambda'
+              # - Fn::Join:
+                  # - '/'
+                  # - - 'path'
+                    # - '2015-03-31'
+                    # - 'functions'
+                    # - Fn::ImportValue: UnicornPostLambdaARN
+                    # - 'invocations'        
+        # IntegrationResponses:
+          # - StatusCode: 200
+            # ResponseParameters:
+                # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                # method.response.header.Access-Control-Allow-Origin: "'*'"          
+        # RequestTemplates:
+          # application/json: !Join 
+            # - ''
+            # - - |
+              # - |
+                # {
+              # - |
+                  # #foreach($param in $input.params().querystring.keySet())
+                  # "$param": "$util.escapeJavaScript($input.params().querystring.get($param))" #if($foreach.hasNext),#end
+                  # #end
+              # - |
+                # }
+      # ResourceId: !Ref Resource01
+      # RestApiId: !ImportValue apiGatewayId
+      # MethodResponses:
+        # - StatusCode: 200
+          # ResponseParameters:
+            # method.response.header.Access-Control-Allow-Headers: true
+            # method.response.header.Access-Control-Allow-Methods: true
+            # method.response.header.Access-Control-Allow-Origin: true          
+        
+        
+          # # - StatusCode: 200
+            # # ResponseTemplates:
+              # # application/json: $input.json('$')
+            # # ResponseParameters:
+                # # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                # # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                # # method.response.header.Access-Control-Allow-Origin: "'*'"
+        # # RequestTemplates:
+          # # application/json: $input.json('$')
+      # # RequestParameters:
+        # # method.request.querystring.name: false
+      # # ResourceId: !Ref Resource01
+      # # RestApiId: !ImportValue apiGatewayId
+      # # MethodResponses:
+        # # - ResponseParameters:
+            # # method.response.header.Access-Control-Allow-Headers: true
+            # # method.response.header.Access-Control-Allow-Methods: true
+            # # method.response.header.Access-Control-Allow-Origin: true
+          # StatusCode: '200'
+            
+  # # HelloCORSRestApiRequestPOST:
+    # # DependsOn: LambdaPermission
+    # # Type: 'AWS::ApiGateway::Method'
+    # # Properties:
+      # # AuthorizationType: NONE
+      # # HttpMethod: POST
+      # # Integration:
+        # # Type: AWS
+        # # IntegrationHttpMethod: POST
+        # # Uri: !Join 
+          # # - ''
+          # # - - 'arn:aws:apigateway:'
+            # # - !Ref 'AWS::Region'
+            # # - ':lambda:path/2015-03-31/functions/'
+            # # - !GetAtt 
+              # # - HelloLambda
+              # # - Arn
+            # # - /invocations
+        # # IntegrationResponses:
+          # # - StatusCode: 200
+            # # ResponseTemplates:
+              # # application/json: $input.json('$')
+            # # ResponseParameters:
+                # # method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                # # method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                # # method.response.header.Access-Control-Allow-Origin: "'*'"
+        # # RequestTemplates:
+          # # application/json: $input.json('$')
+      # # RequestParameters:
+        # # method.request.querystring.name: false
+      # # ResourceId: !Ref HelloCORSRestApiResource
+      # # RestApiId: !Ref HelloCORSRestApi
+      # # MethodResponses:
+        # # - ResponseParameters:
+            # # method.response.header.Access-Control-Allow-Headers: true
+            # # method.response.header.Access-Control-Allow-Methods: true
+            # # method.response.header.Access-Control-Allow-Origin: true
+          # # StatusCode: '200'            
+            
+            
+
+  # # WildRydesRidePostMethod:
+    # # Type: AWS::ApiGateway::Method
+    # # Properties:
+      # # AuthorizerId: !ImportValue ApiAuthorizer
+      # # AuthorizationType: COGNITO_USER_POOLS
+      # # HttpMethod: POST
+      # # ResourceId: !Ref Resource01
+      # # RestApiId: !ImportValue apiGatewayId
+      # # Integration:
+        # # Type: AWS_PROXY
+        # # IntegrationHttpMethod: POST
+        # # Uri:
+          # # Fn::Join:
+            # # - ':'
+            # # - - 'arn:aws:apigateway'
+              # # - Ref: 'AWS::Region'
+              # # - 'lambda'
+              # # - Fn::Join:
+                  # # - '/'
+                  # # - - 'path'
+                    # # - '2015-03-31'
+                    # # - 'functions'
+                    # # - Fn::ImportValue: UnicornPostLambdaARN
+                    # # - 'invocations'  
+# # API Deployment
+  # WildRydesApiGatewayDeployment:
+    # Type: AWS::ApiGateway::Deployment
+    # DependsOn: WildRydesRidePostMethod    
+    # Properties:
+      # Description: Wild Rydes Api
+      # RestApiId: !ImportValue apiGatewayId
+      # StageName: !ImportValue EnvironmentType   
+      
+      
+  # # ApiDeployment:
+    # # Type: 'AWS::ApiGateway::Deployment'
+    # # DependsOn:
+      # # - HelloCORSRestApiRequestGET
+      # # - HelloCORSRestApiRequestPOST
+    # # Properties:
+      # # RestApiId: !Ref HelloCORSRestApi
+      # # StageName: Dev      
+
+# Outputs:
+  # APIdeploymentURL:
+    # Value: 
+       # Fn::Join:
+          # - ''
+          # - - 'https://'
+            # - !ImportValue apiGatewayId
+            # - '.execute-api.'
+            # - !Ref 'AWS::Region'
+            # - '.amazonaws.com'
+            # - "/" 
+            # - "prod"
+            # # - !ImportValue EnvironmentType
+    # Export:
+      # Name: APIdeploymentURL  
