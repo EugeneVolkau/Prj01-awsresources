@@ -43,8 +43,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - dynamodb:PutItem
-                Resource: !ImportValue DynamoDBTable0lARN           
-                
+                Resource: !ImportValue DynamoDBTable0lARN
+                            
   UnicornPostLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -66,6 +66,14 @@ Resources:
             # RestApiId: !ImportValue apiGatewayId
             # Path: /ride
             # Method: post
+            
+            
+  UnicornPostLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:invokeFunction'
+      FunctionName: !GetAtt UnicornPostLambda.Arn
+      Principal: apigateway.amazonaws.com            
 
 Outputs:
   UnicornPostLambdaARN:
