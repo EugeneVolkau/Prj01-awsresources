@@ -52,15 +52,15 @@ Outputs:
   WebsiteURL:
     Value: !GetAtt WebsiteBucket.WebsiteURL
     
-  WebsiteBucketARN:
-    Value:
-       Fn::GetAtt: 
-          - "WebsiteBucket"
-          - "Arn"    
-    Export:
-      Name: WebsiteBucketARN
+  # WebsiteBucketARN:
+    # Value:
+       # Fn::GetAtt: 
+          # - "WebsiteBucket"
+          # - "Arn"    
+    # Export:
+      # Name: WebsiteBucketARN
       
-  WebsiteBucketName:
-    Value: !Ref WebsiteBucket    
-    Export:
-      Name: WebsiteBucketName        
+  # WebsiteBucketName:
+    # Value: !Ref WebsiteBucket    
+    # Export:
+      # Name: WebsiteBucketName        
