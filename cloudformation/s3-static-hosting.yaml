@@ -60,7 +60,7 @@ Outputs:
     # Export:
       # Name: WebsiteBucketARN
       
-  # WebsiteBucketName:
-    # Value: !Ref WebsiteBucket    
-    # Export:
-      # Name: WebsiteBucketName        
+  WebsiteBucketName:
+    Value: !Ref WebsiteBucket    
+    Export:
+      Name: WebsiteBucketName        
