@@ -24,7 +24,7 @@ artifacts:
   files:
     - 's3-static-hosting.yaml'
     - 'cognito.yaml'
-    - 'websiteIntegration.yaml'
+    # - 'websiteIntegration.yaml'
     - 'dynamo.yaml'
     # - 'lambda.yaml'
     - 'restApi.yaml'
