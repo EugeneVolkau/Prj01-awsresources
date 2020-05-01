@@ -105,4 +105,4 @@ Outputs:
             - "/" 
             - !ImportValue EnvironmentType
     Export:
-      Name: APIdeploymentURL  
+      Name: APIdeploymentURL
